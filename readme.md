@@ -1,97 +1,174 @@
-# WhatsApp Mass Sender (JavaFX)
+<div align="center">
 
-A lightweight desktop app that allows you to:
+# 💬 Mass Sender Pro  
+### ⚡ A modern, cross-platform WhatsApp Bulk-Message Manager built with Electron + WhatsApp-Web.js  
 
-* Import contacts from any `.csv` file (Google Contacts compatible)
-* Automatically clean & convert numbers to **International E.164 Format**
-* Compose a text message and optionally attach media
-* Export a cleaned list as `cleaned_contacts.csv`
+<img src="https://user-images.githubusercontent.com/placeholder/qr-demo.png" width="320" alt="App Screenshot" />
 
-> **Note:** Messaging backend (WhatsApp Web automation) will be added later.
+> Import contacts → Clean numbers → Send personalized messages or media in bulk — all from your desktop.
 
----
+[![Made with Electron](https://img.shields.io/badge/Made%20with-Electron-47848F?logo=electron&logoColor=white)](https://www.electronjs.org/)
+[![whatsapp-web.js](https://img.shields.io/badge/API-whatsapp--web.js-25D366?logo=whatsapp&logoColor=white)](https://github.com/pedroslopez/whatsapp-web.js)
+[![MIT License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-## 🖥️ Requirements
-
-| Component | Version      |
-| --------- | ------------ |
-| **Java**  | 17 or higher |
-| **Node.js** | 3.8+         |
+</div>
 
 ---
 
-## 📦 Setup Instructions
+## 🚀 Features
 
-### 1. Clone / Download Project
+- ✅ **Secure WhatsApp Web login** (QR-based, saved locally via `LocalAuth`)
+- 📂 **CSV Import + Auto Cleaning** – detects numbers, removes symbols/spaces  
+- 🧾 **Live Preview & Export** – review contacts, export cleaned list  
+- 📝 **Custom Message Composer** – send text + optional media (image/video)  
+- ⏱️ **Smart Delay Engine** – random delays + auto-pause every 25 sends  
+- ⏸️ **Pause / Resume / Stop** bulk sessions anytime  
+- 💡 **Real-Time Logs & Progress Bar**  
+- 🎨 **Modern Dark UI** with soft glass effect  
+- 💻 **Cross-Platform:** Windows / macOS / Linux  
 
-```
-git clone
-npm install --save-dev electron
+---
+
+## 🧰 Tech Stack
+
+| Layer | Tools |
+|-------|-------|
+| Core | [Electron](https://electronjs.org) |
+| WhatsApp API | [whatsapp-web.js](https://github.com/pedroslopez/whatsapp-web.js) |
+| UI / Frontend | HTML + CSS + Vanilla JS |
+| Data | CSV-Parser, QRCode |
+| Packaging | Electron Builder (NSIS Installer) |
+
+---
+
+## 📦 Installation / Setup
+2️⃣ Install dependencies
+npm install
+
+3️⃣ Start the app (dev mode)
 npm start
-```
 
-### 2. Build Project
+4️⃣ Build a Windows installer
+npm run dist
 
-```
-mvn clean package
-```
 
-### 3. Run Application
+Output will appear in dist/ (auto-creates .exe installer).
 
-```
-java -jar target/mass-sender-javafx-1.0.0-jar-with-dependencies.jar
-```
+🖥️ Usage Guide
 
----
+Run Mass Sender Pro
+You’ll see a QR code — scan it with WhatsApp on your phone.
 
-## 📁 How to Use
+Import Contacts (.csv)
+File → Select CSV (column = numbers).
+Example:
 
-### 1. Import Contacts
++919876543210
+918765432109
++441234567890
 
-* Click **"Choose CSV"**
-* Select any `.csv` file containing phone numbers
-* App will **auto-detect & convert** to safe international format
 
-### 2. Compose Message
+Preview Contacts
+Click Preview to verify list, remove duplicates if needed.
 
-* Write your message in text box
-* (Optional) Attach an image/video file
+Compose Message
+Type your message and optionally attach media.
 
-### 3. Export Clean List
+Set Delay Range
+Random delays (e.g. 3000–7000 ms) help reduce ban risk.
 
-* Click **"Export cleaned_contacts.csv"**
-* This file will be used for sending messages later
+Start Bulk Send
+Press Start — watch progress bar + logs.
+Use Pause / Stop anytime.
 
----
+Export Cleaned CSV (optional)
+Downloads a validated list of numbers.
 
-## 📱 CSV Format Supported
+📸 UI Preview
+Login / QR	Dashboard
 
-```
-+1 415 555 1212
-+91-98765-43210
-0044 7911 123456
-9876543210
-```
+	
 
-All formats are automatically normalized.
+Replace the above images with your own screenshots under /assets/demo/.
 
----
+⚙️ Project Structure
+mass-sender-pro/
+├── main.js              # Electron main process
+├── preload.js           # Secure IPC bridge
+├── renderer.html        # UI layout
+├── renderer.js          # Frontend logic + events
+├── package.json         # Scripts + build config
+└── assets/
+    ├── icon.png
+    └── icon.ico
 
-## 🔧 Future Features (Coming Soon)
+🧩 Build Options
+Command	Description
+npm start	Run in development mode
+npm run pack	Package raw build folder
+npm run dist	Create Windows installer (NSIS)
+⚠️ Important Disclaimer
 
-* Built-in WhatsApp Web QR login
-* Show profile name & picture after login
-* Send text + media to all contacts with smart delay
-* Delivery report & logs
+This tool uses WhatsApp Web automation (whatsapp-web.js).
+It is not officially endorsed by WhatsApp Inc.
+Sending unsolicited / bulk spam messages can violate WhatsApp’s Terms of Service.
+Use for personal or authorized business communication only.
+The developer assumes no responsibility for misuse.
 
----
+🧠 Best Practices for Safe Use
 
-## 🤝 Contributing
+Always use your own verified WhatsApp Business account.
 
-Pull Requests are welcome.
+Keep delays between messages ≥ 3 seconds.
 
----
+Avoid sending to unknown numbers in bulk.
 
-## 📄 License
+Don’t use multiple instances from one IP simultaneously.
 
-This project is open-source and free to modify and use.
+Regularly clear sessions (LocalAuth folder) to refresh login.
+
+🌟 Roadmap
+
+ Variable templates (Hi {Name} style)
+
+ Delivery reports & logs
+
+ Multi-account support
+
+ Cloud sync / dashboard
+
+ Analytics + statistics view
+
+👨‍💻 Contributing
+
+Fork the repo
+
+Create a branch: git checkout -b feature/your-feature
+
+Commit: git commit -m 'Add feature'
+
+Push: git push origin feature/your-feature
+
+Open a Pull Request 🎉
+
+📜 License
+
+Licensed under the MIT License
+.
+Copyright © 2025 Mass Sender Pro Team
+
+🧭 Author & Credits
+
+Dev & UI: Raxx (GitHub.com/RaxxDev)
+
+Based on: whatsapp-web.js
+ by Pedro López
+Design Inspiration: [ShadCN UI / Electron Dark Themes]
+
+<div align="center">
+
+⭐ If you like this project, please star it on GitHub and share it!
+<br/>
+Built with 💙 for developers and creators by Raxx
+
+</div> ```
