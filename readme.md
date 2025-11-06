@@ -16,7 +16,7 @@ A lightweight desktop app that allows you to:
 | Component | Version      |
 | --------- | ------------ |
 | **Java**  | 17 or higher |
-| **React** | 3.8+         |
+| **Node.js** | 3.8+         |
 
 ---
 
