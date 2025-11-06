@@ -43,13 +43,14 @@
 
 ## 📦 Installation / Setup
 2️⃣ Install dependencies
-npm install
+> ```npm install```
 
 3️⃣ Start the app (dev mode)
-npm start
+
+> ```npm start```
 
 4️⃣ Build a Windows installer
-npm run dist
+> ```npm run dist```
 
 
 Output will appear in dist/ (auto-creates .exe installer).
@@ -88,7 +89,7 @@ Downloads a validated list of numbers.
 Login / QR	Dashboard
 
 	
-
+```
 Replace the above images with your own screenshots under /assets/demo/.
 
 ⚙️ Project Structure
@@ -115,60 +116,119 @@ Sending unsolicited / bulk spam messages can violate WhatsApp’s Terms of Servi
 Use for personal or authorized business communication only.
 The developer assumes no responsibility for misuse.
 
-🧠 Best Practices for Safe Use
+```
+---
 
-Always use your own verified WhatsApp Business account.
+## 🚀 Features
 
-Keep delays between messages ≥ 3 seconds.
+- Secure **QR Login** (LocalAuth saves session)
+- **CSV Import + Auto Number Cleaning**
+- **Preview Contacts** before sending
+- **Send Text + Media (Images / Videos / Docs)**
+- **Smart Random Delay System** (Anti-ban friendly)
+- **Pause / Resume / Stop During Sending**
+- **Real-Time Logs + Progress Bar**
+- Clean, **Modern Dark UI**
+- Works on **Windows / Mac / Linux**
 
-Avoid sending to unknown numbers in bulk.
+---
 
-Don’t use multiple instances from one IP simultaneously.
+## 🧰 Tech Stack
+| Component | Technology |
+|---|---|
+| Desktop Framework | Electron |
+| WhatsApp Control | whatsapp-web.js |
+| UI | HTML + CSS + JS |
+| Data | CSV Parser + QRCode |
+| Packaging | Electron Builder (NSIS Installer) |
 
-Regularly clear sessions (LocalAuth folder) to refresh login.
+---
 
-🌟 Roadmap
+## 📦 Installation
 
- Variable templates (Hi {Name} style)
+```bash
+git clone https://github.com/YOUR-USERNAME/mass-sender-pro
+cd mass-sender-pro
+npm install
+npm start
+```
 
- Delivery reports & logs
+---
 
- Multi-account support
+## 🏗️ Build Windows Installer
 
- Cloud sync / dashboard
+```bash
+npm run dist
+```
+Installer will be created in the **dist/** folder.
 
- Analytics + statistics view
+---
 
-👨‍💻 Contributing
+## 🖥️ How To Use
 
-Fork the repo
+1. Open app → Scan QR with your phone WhatsApp
+2. Click **Import CSV** and choose your contacts file
+3. Write your **message**
+4. (Optional) Attach media file
+5. Set **Delay (ms)** — recommended 3000-7000
+6. Hit **Start**
+7. Watch **progress + live logs**
+8. You can **Pause**, **Resume**, or **Stop** anytime
 
-Create a branch: git checkout -b feature/your-feature
+---
 
-Commit: git commit -m 'Add feature'
+## 📌 CSV Format Example
 
-Push: git push origin feature/your-feature
+```
++919876543210
+918765432109
++441234567890
+```
 
-Open a Pull Request 🎉
+- No header required
+- One number per line
+- App auto-cleans spaces, +, etc.
 
-📜 License
+---
 
-Licensed under the MIT License
-.
-Copyright © 2025 Mass Sender Pro Team
+## ⚠️ Disclaimer
 
-🧭 Author & Credits
+This project uses **WhatsApp Web automation** via `whatsapp-web.js`.  
+This is **not an official WhatsApp product**.
 
-Dev & UI: Raxx (GitHub.com/RaxxDev)
+- Do **not** use for spam
+- Only send to **consenting users**
+- Use responsibly or your number **may get restricted**
 
-Based on: whatsapp-web.js
- by Pedro López
-Design Inspiration: [ShadCN UI / Electron Dark Themes]
+---
 
-<div align="center">
+## 🌟 Roadmap
 
-⭐ If you like this project, please star it on GitHub and share it!
-<br/>
-Built with 💙 for developers and creators by Raxx
+- Variable Messages (e.g. `Hi {Name}`)
+- Delivery Reports
+- Multi-Account Switching
+- UI Themes
+- Analytics Dashboard
 
-</div> ```
+---
+
+## 🤝 Contributing
+
+```bash
+git checkout -b feature-name
+git commit -m "added new feature"
+git push origin feature-name
+```
+Then create a Pull Request ✅
+
+---
+
+## 📜 License
+This project is licensed under the **MIT License**.
+
+---
+
+## ✨ Credits
+Built with ❤️ using:
+- **whatsapp-web.js** by Pedro López
+- **Electron**
