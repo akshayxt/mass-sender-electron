@@ -76,19 +76,17 @@ function initWhatsAppClient() {
 }
 
 // IPC from renderer: send messages, import csv, attach media
-ipcMain.handle('import-csv', async (event, csvPath) => {
-  return new Promise((resolve, reject) => {
-    const results = [];
-    fs.createReadStream(csvPath)
-      .pipe(csv({ headers: false }))
-      .on('data', (data) => {
-        const num = (data[0] || data['0'] || '').toString().replace(/[^0-9+]/g,'').trim();
-        if (num) results.push(num);
-      })
-      .on('end', () => resolve(results))
-      .on('error', err => reject(err));
+const { dialog } = require('electron');
+
+ipcMain.handle('choose-csv', async () => {
+  const result = await dialog.showOpenDialog({
+    filters: [{ name: 'CSV Files', extensions: ['csv'] }],
+    properties: ['openFile']
   });
+  if (result.canceled || !result.filePaths.length) return null;
+  return result.filePaths[0];
 });
+
 
 ipcMain.handle('send-bulk', async (event, { contacts, message, mediaPath, delayMin, delayMax }) => {
   if (!waClient || !waClient.info) throw new Error('WhatsApp not ready');
