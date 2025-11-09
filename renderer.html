@@ -1,57 +1,483 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <title>Mass Sender - App</title>
-  <style>
-    body { font-family: sans-serif; margin: 12px; background:#111; color:#fff }
-    .container { display:flex; gap:12px; }
-    .left, .right { background:#2b5b75; padding:12px; border-radius:12px; }
-    .left { width:320px; min-height:480px; }
-    .right { flex:1; min-height:480px; }
-    img#qr { width:260px; height:260px; background:#fff; display:block; margin-bottom:8px; }
-    #profilePic { width:64px; height:64px; border-radius:50%; background:#ddd; display:block; }
-    textarea { width:100%; height:120px; border-radius:8px; padding:8px; }
-    input[type=text] { padding:6px; border-radius:6px; }
-    button { padding:8px 12px; border-radius:8px; margin:4px; }
-    #log { width:100%; height:140px; background:#071019; color:#9fd; padding:8px; border-radius:8px; overflow:auto }
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>XT'S MassSender </title>
+
+<style>
+  /* ===========================
+     THEME / ACCENT VARIABLES
+     =========================== */
+  :root{
+    --bg: #050505;
+    --text: #e7eef6;
+    --panel-bg: rgba(10,10,12,0.45); /* glass base */
+    --panel-border: rgba(255,255,255,0.04);
+    --input-bg: rgba(6,8,10,0.6);
+    --accent1: #00fff0; /* cyan */
+    --accent2: #ff00ff; /* magenta */
+    --accent-mid: linear-gradient(90deg,var(--accent1),var(--accent2));
+    --muted: rgba(255,255,255,0.65);
+    --glass-blur: 10px;
+    --shadow-glow: 0 20px 50px rgba(0,255,240,0.055);
+    --radius: 14px;
+  }
+
+  /* LIGHT THEME OVERRIDES */
+  body.light {
+    --bg: #f6f8fb;
+    --text: #0b1220;
+    --panel-bg: rgba(255,255,255,0.7);
+    --panel-border: rgba(10,12,20,0.04);
+    --input-bg: rgba(255,255,255,0.9);
+    --muted: rgba(10,12,20,0.75);
+    --shadow-glow: 0 20px 50px rgba(0,122,255,0.06);
+  }
+
+  /* Basic */
+  * { box-sizing: border-box; }
+  html,body { height:100%; }
+  body{
+    margin:18px;
+    font-family: "Segoe UI", Roboto, system-ui, -apple-system, "Helvetica Neue", Arial;
+    background: radial-gradient(1200px 600px at 10% 10%, rgba(0,255,240,0.03), transparent),
+                radial-gradient(1000px 500px at 90% 80%, rgba(255,0,255,0.02), transparent),
+                var(--bg);
+    color:var(--text);
+    transition: background .35s ease, color .25s ease;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* Topbar */
+  .topbar {
+    display:flex;
+    gap:12px;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:18px;
+  }
+  .topbar-left { display:flex; gap:12px; align-items:center; }
+  h1 { font-size:18px; margin:0; letter-spacing:0.2px; font-weight:600; }
+
+  /* Controls in topbar */
+  .top-actions { display:flex; gap:10px; align-items:center; }
+
+  .btn {
+    -webkit-tap-highlight-color: transparent;
+    padding:8px 12px;
+    border-radius:10px;
+    border: none;
+    cursor:pointer;
+    position:relative;
+    overflow:hidden;
+    background: linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    color:var(--muted);
+    box-shadow: none;
+    transition:transform .18s ease, box-shadow .18s ease;
+    font-weight:600;
+    font-size:13px;
+  }
+  .btn:active { transform:translateY(1px) scale(.997); }
+
+  /* Gradient Neon Button */
+  .btn.gradient {
+    color: #061016;
+    background: linear-gradient(90deg, rgba(255,255,255,0.92) 0%, rgba(255,255,255,0.92) 0%);
+    padding:10px 14px;
+  }
+  .btn.gradient::before{
+    content:"";
+    position:absolute; inset:0;
+    z-index:0;
+    background: var(--accent-mid);
+    background-size:300%;
+    filter:contrast(1.05) saturate(1.1);
+    transform:translateZ(0);
+    opacity:0.95;
+    mix-blend-mode:screen;
+    transition:filter .3s ease;
+  }
+  .btn.gradient .label{ position:relative; z-index:1; color:#061016; }
+
+  .btn.ghost {
+    background:transparent;
+    border:1px solid rgba(255,255,255,0.04);
+    color: var(--muted);
+    padding:8px 10px;
+  }
+
+  /* button hover sheen */
+  .btn.gradient:hover::after{
+    content:"";
+    position:absolute; inset:-40% -40% auto -40%;
+    height:120%;
+    transform:rotate(25deg);
+    background: linear-gradient(to right, rgba(255,255,255,0.18), rgba(255,255,255,0.02));
+    animation: sheen 0.9s ease forwards;
+  }
+  @keyframes sheen {
+    from { left:-60%; opacity:0; }
+    to   { left:130%; opacity:1; }
+  }
+
+  /* Layout grid + collapsible sidebar */
+  .app {
+    display:grid;
+    grid-template-columns: 340px 1fr;
+    gap:18px;
+    align-items:start;
+  }
+
+  /* Collapsed state */
+  .collapsed .app { grid-template-columns: 72px 1fr; }
+  .collapsed .left .panel-content { display:none; }
+  .collapsed .left { width:72px; min-width:72px; padding:12px 8px; }
+  .collapsed .left .logo-mini { display:block; }
+  .left .logo-mini { display:none; }
+
+  /* PANEL: glass card with neon border */
+  .panel {
+    position:relative;
+    border-radius:var(--radius);
+    padding:16px;
+    background: var(--panel-bg);
+    border:1px solid var(--panel-border);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    box-shadow: var(--shadow-glow);
+    overflow:hidden;
+  }
+
+  /* animated RGB edge (thin) */
+  .panel::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    border-radius:inherit;
+    padding:2px;
+    background: linear-gradient(90deg, var(--accent1), var(--accent2), var(--accent1));
+    background-size:300%;
+    animation: edgeFlow 6s linear infinite;
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+            mask-composite: exclude;
+    pointer-events:none;
+    opacity:0.95;
+    mix-blend-mode:screen;
+  }
+  @keyframes edgeFlow { 0%{background-position:0%} 100%{background-position:300%} }
+
+  /* Sidebar specifics */
+  .left {
+    display:flex; flex-direction:column; gap:12px;
+    min-height:520px;
+  }
+  .left .profile {
+    display:flex; gap:10px; align-items:center;
+  }
+  #profilePic {
+    width:70px; height:70px; border-radius:50%;
+    object-fit:cover; border:2px solid rgba(255,255,255,0.06);
+    background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+  }
+  .left .panel-content { display:block; }
+
+  .logo-mini {
+    width:44px; height:44px; border-radius:8px;
+    display:none; align-items:center; justify-content:center;
+    font-weight:700; font-size:14px;
+    background:rgba(255,255,255,0.03);
+    color:var(--muted);
+  }
+
+  /* Right / Main area */
+  .right { min-height:520px; display:flex; flex-direction:column; gap:12px; }
+  .row { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+
+  textarea, input[type=text], input[type=file], select {
+    width:100%; margin-top:6px;
+    padding:10px; border-radius:10px;
+    background:var(--input-bg);
+    color:var(--text);
+    border:1px solid rgba(255,255,255,0.04);
+    outline:none; font-size:14px;
+  }
+
+  label.inline { display:flex; gap:8px; align-items:center; font-size:13px; color:var(--muted); }
+  .small { font-size:13px; color:var(--muted); }
+
+  /* QR square */
+  #qr {
+    width:100%;
+    aspect-ratio:1/1;
+    border-radius:12px;
+    background:linear-gradient(180deg,#ffffff 0%, #e6f6f6 100%);
+    display:block;
+    object-fit:cover;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.45);
+    border:1px solid rgba(0,0,0,0.06);
+  }
+
+  /* log */
+  #log {
+    height:170px; overflow:auto; border-radius:10px;
+    background: linear-gradient(180deg, rgba(0,0,0,0.6), rgba(0,0,0,0.45));
+    padding:10px; color:var(--accent1); font-family:monospace; font-size:13px;
+    border:1px solid rgba(255,255,255,0.03);
+  }
+
+  /* status pill */
+  #status {
+    display:inline-block; padding:6px 10px; border-radius:999px;
+    background: linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    color:var(--muted); border:1px solid rgba(255,255,255,0.03);
+    font-weight:600; font-size:13px;
+  }
+
+  /* collapse toggle look */
+  .collapse-toggle { width:44px; height:44px; display:flex; align-items:center; justify-content:center; border-radius:10px; }
+
+  /* small screens */
+  @media (max-width:880px){
+    .app { grid-template-columns: 1fr; }
+    .collapsed .app { grid-template-columns: 1fr; }
+    .left { order:2; }
+    .right { order:1; }
+  }
+
+  /* Accessibility reductions */
+  @media (prefers-reduced-motion: reduce){
+    * { animation:none !important; transition:none !important; }
+  }
+
+</style>
 </head>
 <body>
-  <h2>Mass Sender — App (WhatsApp)</h2>
-  <div class="container">
-    <div class="left">
-      <h3>Login & Profile</h3>
-      <img id="qr" src="" alt="QR will appear here" />
-      <div><strong id="status">Waiting for QR...</strong></div>
-      <div style="margin-top:12px;">
-        <img id="profilePic" src="" alt="profile" />
-        <div id="profileName">Not connected</div>
-      </div>
-      <hr style="margin-top:12px;border:1px solid rgba(255,255,255,0.08)" />
-      <div>
-        <input id="csvPath" type="file" accept=".csv" />
-        <div id="contactsCount">No contacts</div>
-      </div>
+  <!-- topbar -->
+  <div class="topbar" role="banner">
+    <div class="topbar-left">
+      <button id="collapseBtn" class="btn ghost collapse-toggle" title="Toggle sidebar" aria-pressed="false">
+        <!-- simple icon -->
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <h1>XT's Mass Sender</h1>
+      <div class="small" style="margin-left:8px;color:var(--muted)">Github ID :- AkshayXT</div>
     </div>
 
-    <div class="right">
-      <h3>Compose</h3>
-      <textarea id="message">Write your message here...</textarea>
-      <div style="margin-top:8px;">
-        <input id="mediaPath" type="file" accept="image/*,video/*" />
-        <label>Delay min (ms): <input id="delayMin" type="text" value="3000" /></label>
-        <label>max (ms): <input id="delayMax" type="text" value="7000" /></label>
-      </div>
-      <div style="margin-top:12px;">
-        <button id="btnStart">Start Sending</button>
-      </div>
-
-      <h3>Log</h3>
-      <div id="log"></div>
+    <div class="top-actions">
+      <button id="themeSwitch" class="btn ghost" title="Toggle theme">Switch Theme</button>
+      <button id="presetBtn" class="btn gradient" title="Cyber preset"><span class="label">Raxx XT Soft</span></button>
     </div>
   </div>
 
-  <script src="renderer.js"></script>
+  <!-- app grid -->
+  <div id="appWrap" class="app-wrap">
+    <div id="rootApp" class="app">
+
+      <!-- LEFT SIDEBAR -->
+      <aside class="left panel" id="leftPanel" aria-label="Sidebar">
+        <div style="display:flex;align-items:center;gap:10px;justify-content:space-between;">
+          <div style="display:flex;gap:10px;align-items:center;">
+            <div class="logo-mini">MS</div>
+            <div style="display:flex;flex-direction:column;">
+              <strong id="appTitle" style="font-size:14px;">Mass Sender</strong>
+              <span class="small">WhatsApp Tool</span>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;">
+            <button id="qrRefresh" class="btn ghost" title="Refresh QR">Refresh</button>
+          </div>
+        </div>
+
+        <div class="panel-content" style="margin-top:10px;">
+          <h3 style="margin:0 0 6px 0">Login & Profile</h3>
+          <img id="qr" src="" alt="QR code placeholder" aria-hidden="true">
+
+          <div id="status" style="margin-top:10px">Waiting for QR...</div>
+
+          <div class="profile" style="margin-top:12px;">
+            <img id="profilePic" src="" alt="Profile picture">
+            <div>
+              <div id="profileName" class="small">Not Connected</div>
+              <div id="profilePhone" class="small" style="color:var(--muted)">—</div>
+            </div>
+          </div>
+
+          <hr style="opacity:0.08;margin:12px 0">
+
+          <div>
+            <label class="small">Upload contacts (.csv)</label>
+            <input id="csvPath" type="file" accept=".csv">
+            <div id="contactsCount" class="small" style="margin-top:6px;color:var(--muted)">No contacts</div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- RIGHT / MAIN -->
+      <main class="right panel" role="main">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;">
+          <h3 style="margin:0">Compose Message</h3>
+          <div class="small" style="color:var(--muted)">You can attach media & set delays</div>
+        </div>
+
+        <div>
+          <label class="small">Message</label>
+          <textarea id="message" rows="6" placeholder="Write your message here...">Write your message here...</textarea>
+        </div>
+
+        <div class="row">
+          <div style="flex:1;min-width:180px;">
+            <label class="small">Attach Media</label>
+            <input id="mediaPath" type="file" accept="image/*,video/*">
+          </div>
+
+          <div style="width:160px;">
+            <label class="inline small">Delay Min (ms):
+              <input id="delayMin" type="text" value="3000" />
+            </label>
+          </div>
+
+          <div style="width:160px;">
+            <label class="inline small">Delay Max (ms):
+              <input id="delayMax" type="text" value="7000" />
+            </label>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:12px;align-items:center;margin-top:6px;">
+          <button id="btnStart" class="btn gradient"><span class="label">Start Sending</span></button>
+          <button id="btnStop" class="btn ghost" style="display:none;">Stop</button>
+          <div style="flex:1"></div>
+          <div class="small" style="color:var(--muted)">Status: <span id="liveState">Idle</span></div>
+        </div>
+
+        <h3 style="margin-top:16px;margin-bottom:6px;">Log</h3>
+        <div id="log" aria-live="polite" aria-atomic="false"></div>
+      </main>
+
+    </div>
+  </div>
+<script>
+/* ===========================================
+   Theme / UI State
+=========================================== */
+const THEME_KEY = "ms_theme";
+const COLLAPSE_KEY = "ms_sidebar_collapsed";
+
+const body = document.body;
+const themeSwitch = document.getElementById("themeSwitch");
+const collapseBtn = document.getElementById("collapseBtn");
+const liveState = document.getElementById("liveState");
+const btnStart = document.getElementById("btnStart");
+const btnStop  = document.getElementById("btnStop");
+const logEl = document.getElementById("log");
+
+// Restore theme
+if(localStorage.getItem(THEME_KEY)==="light") body.classList.add("light");
+
+// Theme toggle
+themeSwitch.onclick = () => {
+  body.classList.toggle("light");
+  localStorage.setItem(THEME_KEY, body.classList.contains("light") ? "light" : "dark");
+};
+
+// Sidebar collapse persist
+if(localStorage.getItem(COLLAPSE_KEY)==="1") document.documentElement.classList.add("collapsed");
+collapseBtn.onclick = () => {
+  const collapsed = document.documentElement.classList.toggle("collapsed");
+  localStorage.setItem(COLLAPSE_KEY, collapsed ? "1" : "0");
+};
+
+/* ===========================================
+   REAL APP CONNECTED EVENTS (NO DEMO)
+=========================================== */
+
+// QR Display
+api.onQR(data => {
+  const qr = document.getElementById("qr");
+  qr.src = "";                 // important: reset first to avoid stale image
+  setTimeout(()=> qr.src = data, 20);
+  document.getElementById("status").innerText = "Scan QR with WhatsApp";
+});
+
+// WhatsApp Ready
+api.onReady(() => {
+  document.getElementById("status").innerText = "Connected ✅";
+  liveState.textContent = "Connected";
+});
+
+// Profile Data
+api.onProfile(({ name, pfp, phone }) => {
+  document.getElementById("profileName").innerText = name || "Connected";
+  document.getElementById("profilePhone").innerText = phone || "";
+  if(pfp) document.getElementById("profilePic").src = pfp;
+});
+
+/* ===========================================
+   CSV IMPORT
+=========================================== */
+let CONTACTS = [];
+
+csvPath.onchange = async () => {
+  let filePath;
+  const file = csvPath.files[0];
+  if (file && file.path) {
+    filePath = file.path;
+  } else {
+    filePath = await api.chooseCsv();
+  }
+
+  if (!filePath) return;
+
+  CONTACTS = await api.importCsv(filePath);
+  document.getElementById("contactsCount").innerText =
+    `${CONTACTS.length} contacts loaded ✅`;
+};
+
+/* ===========================================
+   START / STOP Sending
+=========================================== */
+btnStart.onclick = () => {
+  if(!CONTACTS.length) return alert("Please load contacts first!");
+
+  btnStart.style.display = "none";
+  btnStop.style.display = "";
+  liveState.textContent = "Sending...";
+
+  api.sendBulk({
+    contacts: CONTACTS,
+    message: document.getElementById("message").value,
+    mediaPath: (mediaPath.files[0] || {}).path || null,
+    delayMin: parseInt(delayMin.value)||3000,
+    delayMax: parseInt(delayMax.value)||7000
+  });
+};
+
+// Stop sending
+btnStop.onclick = () => {
+  api.sendBulk({ stop: true }); // <-- backend should handle this (optional)
+  btnStart.style.display = "";
+  btnStop.style.display = "none";
+  liveState.textContent = "Stopped";
+};
+
+/* ===========================================
+   REAL SEND PROGRESS LOG
+=========================================== */
+api.onProgress(({ index, total, phone, error }) => {
+  liveState.textContent = `Sending (${index}/${total})`;
+  logEl.innerHTML = `<div>${error ? "❌" : "✅"} ${phone}</div>` + logEl.innerHTML;
+
+  if(index === total){
+    btnStart.style.display = "";
+    btnStop.style.display = "none";
+    liveState.textContent = "Completed ✅";
+  }
+});
+</script>
+
 </body>
 </html>
