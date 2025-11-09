@@ -4,6 +4,7 @@ contextBridge.exposeInMainWorld('api', {
   onQR: (fn) => ipcRenderer.on('wa-qr', (e, data) => fn(data)),
   onReady: (fn) => ipcRenderer.on('wa-ready', () => fn()),
   onProfile: (fn) => ipcRenderer.on('wa-profile', (e, data) => fn(data)),
+  chooseCsv: () => ipcRenderer.invoke('choose-csv'),
   onAuth: (fn) => ipcRenderer.on('wa-auth', () => fn()),
   onAuthFail: (fn) => ipcRenderer.on('wa-auth-failure', (e, data) => fn(data)),
   importCsv: (path) => ipcRenderer.invoke('import-csv', path),
